@@ -2,6 +2,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_boost/flutter_boost.dart';
 import 'package:flutter_example_test/PlatFormMethod.dart';
+import 'package:flutter_example_test/lang/translation_service.dart';
 import 'package:flutter_example_test/listener/AppLifecycleObserver.dart';
 import 'package:flutter_example_test/network/ApiService.dart';
 import 'package:flutter_example_test/network/DioRequest.dart';
@@ -14,6 +15,7 @@ import 'package:get/get.dart';
 void main(){
   PageVisibilityBinding.instance.addGlobalObserver(AppLifecycleObserver());
   CustomFlutterBinding();
+  debugPrint("flutter ---  main()");
   // ApiService.configureDio();
   DioRequest.initLocalTimeZone();
   runApp(const MyApp());
@@ -43,6 +45,7 @@ class MyApp extends StatefulWidget {
 }
 
 class _MyAppState extends State<MyApp> {
+
   static Map<String, FlutterBoostRouteFactory> routerMap = {
     "/":(settings, uniqueId){
       return CupertinoPageRoute(settings:settings,builder: (_){
@@ -51,6 +54,9 @@ class _MyAppState extends State<MyApp> {
     },
     "homePage":(settings, uniqueId){
       return CupertinoPageRoute(settings:settings,builder: (_){
+        Map<String, dynamic> arguments = settings.arguments as Map<String,dynamic>;
+        bool changeLocal = arguments["changeLocal"];
+        debugPrint("changeLocal --> $changeLocal");
         return const MyHomePage(title: "Flutter Demo Home");
       });
     },
@@ -104,7 +110,10 @@ class _MyAppState extends State<MyApp> {
   Widget build(BuildContext context) {
     return FlutterBoostApp(
       routeFactory,
-      appBuilder: (child) => MaterialApp(
+      appBuilder: (child) => GetMaterialApp(
+        translations: TranslationService(),
+        locale: const Locale('zh','CN'),
+        fallbackLocale: const Locale('zh','CN'),
         home: child,
       ),
     );
@@ -131,7 +140,7 @@ class MyHomePage extends StatefulWidget {
   State<MyHomePage> createState() => _MyHomePageState();
 }
 
-class _MyHomePageState extends State<MyHomePage> {
+class _MyHomePageState extends State<MyHomePage>{
   final _sum = 0.obs;
   final _sub = 0.obs;
   final _result = "".obs;
@@ -188,6 +197,9 @@ class _MyHomePageState extends State<MyHomePage> {
                   ),
                 ),
             ),
+            Text(
+              'test'.tr,
+            ),
             InkWell(
               child: Obx(() =>
                   Column(
@@ -225,7 +237,10 @@ class _MyHomePageState extends State<MyHomePage> {
             }, child: const Text('调用native中的方法')),
             ElevatedButton(onPressed: () => {
               BoostNavigator.instance.push("listPage")
-            }, child: const Text('打开列表页面'))
+            }, child: const Text('打开列表页面')),
+            ElevatedButton(onPressed: () => {
+              Get.updateLocale(const Locale('en','US'))
+            }, child: const Text('切换英文'))
           ],
         ),
       ),

@@ -29,7 +29,7 @@ class DioRequest {
       debugPrint("data = ${response.data}");
       debugPrint("\n");
       handler.next(response);
-    }, onError: (DioError e, handler) {
+    }, onError: (DioException e, handler) {
       debugPrint("\n================== 错误响应数据 ======================");
       debugPrint("type = ${e.type}");
       debugPrint("message = ${e.message}");
