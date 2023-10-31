@@ -41,12 +41,16 @@ class _NetworkPageState extends State<NetworkPage> {
     );
   }
 
-  void requestBrands() async{
-    String url = ApiService.brands_url;
-    var requestStr = ApiService.dio.options.headers.toString();
-
-    final response = await ApiService.dio.get(url);
-    _response.value = "$requestStr\n$response";
-    callNativeMethod("dismissLoading");
+  void requestBrands() {
+    // String url = ApiService.brands_url;
+    // var requestStr = ApiService.dio.options.headers.toString();
+    //
+    // final response = await ApiService.dio.get(url);
+    // _response.value = "$requestStr\n$response";
+    // callNativeMethod("dismissLoading");
+    ApiService.getBrands().then((value){
+      _response.value = "$value";
+      callNativeMethod("dismissLoading");
+    });
   }
 }

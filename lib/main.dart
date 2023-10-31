@@ -4,6 +4,7 @@ import 'package:flutter_boost/flutter_boost.dart';
 import 'package:flutter_example_test/PlatFormMethod.dart';
 import 'package:flutter_example_test/listener/AppLifecycleObserver.dart';
 import 'package:flutter_example_test/network/ApiService.dart';
+import 'package:flutter_example_test/network/DioRequest.dart';
 import 'package:flutter_example_test/page/ListPage.dart';
 import 'package:flutter_example_test/page/NetworkPage.dart';
 import 'package:flutter_example_test/page/ThirdPage.dart';
@@ -13,7 +14,8 @@ import 'package:get/get.dart';
 void main(){
   PageVisibilityBinding.instance.addGlobalObserver(AppLifecycleObserver());
   CustomFlutterBinding();
-  ApiService.configureDio();
+  // ApiService.configureDio();
+  DioRequest.initLocalTimeZone();
   runApp(const MyApp());
 }
 

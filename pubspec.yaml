@@ -37,7 +37,6 @@ dependencies:
   easy_refresh: ^3.3.2+2
   json_annotation: ^4.8.1
   dio: ^5.3.3
-  flutter_timezone: ^1.0.8
 
 dev_dependencies:
   flutter_test:
