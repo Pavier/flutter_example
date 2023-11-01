@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_boost/flutter_boost.dart';
+import 'package:flutter_example_test/utils/SharedPrefsUtils.dart';
 import 'package:get/get.dart';
 import 'package:get/get_navigation/src/router_report.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class AppLifecycleObserver with GlobalPageVisibilityObserver {
   @override
@@ -40,7 +42,23 @@ class AppLifecycleObserver with GlobalPageVisibilityObserver {
   void onPageShow(Route route) {
     super.onPageShow(route);
     debugPrint("AppLifecycleObserver - onPageShow");
-    debugPrint("更新语言---> zh");
-    Get.updateLocale(const Locale('zh','CN'));
+    var arg = route.settings.arguments as Map<String,dynamic>;
+    debugPrint("$arg  更新语言---> zh");
+    var local = arg['local'] ?? 'zh';
+
+    // SharedPreferences.getInstance().then((prefs) {
+    //   var cacheLocal = prefs.getString("local");
+    //   debugPrint("$arg  更新语言---> cacheLocal: $cacheLocal   local $local");
+    //   if(local != cacheLocal){
+    //     debugPrint("-------开始更新-----");
+    //     prefs.setString('local', local);
+    //     Get.updateLocale(Locale(local));
+    //   }
+    // });
+    if(SharedPrefsUtils.getString("local") != local){
+      SharedPrefsUtils.setString('local', local);
+      Get.updateLocale(Locale(local));
+    }
+
   }
 }

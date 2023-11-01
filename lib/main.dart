@@ -10,6 +10,7 @@ import 'package:flutter_example_test/page/ListPage.dart';
 import 'package:flutter_example_test/page/NetworkPage.dart';
 import 'package:flutter_example_test/page/ThirdPage.dart';
 import 'package:flutter_example_test/page/secondPage.dart';
+import 'package:flutter_example_test/utils/SharedPrefsUtils.dart';
 import 'package:get/get.dart';
 
 void main(){
@@ -54,9 +55,6 @@ class _MyAppState extends State<MyApp> {
     },
     "homePage":(settings, uniqueId){
       return CupertinoPageRoute(settings:settings,builder: (_){
-        Map<String, dynamic> arguments = settings.arguments as Map<String,dynamic>;
-        bool changeLocal = arguments["changeLocal"];
-        debugPrint("changeLocal --> $changeLocal");
         return const MyHomePage(title: "Flutter Demo Home");
       });
     },
@@ -239,7 +237,8 @@ class _MyHomePageState extends State<MyHomePage>{
               BoostNavigator.instance.push("listPage")
             }, child: const Text('打开列表页面')),
             ElevatedButton(onPressed: () => {
-              Get.updateLocale(const Locale('en','US'))
+            SharedPrefsUtils.setString('local', 'en'),
+              Get.updateLocale(const Locale('en'))
             }, child: const Text('切换英文'))
           ],
         ),
