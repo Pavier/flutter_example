@@ -4,13 +4,14 @@ import 'package:flutter_boost/flutter_boost.dart';
 import 'package:flutter_example_test/PlatFormMethod.dart';
 import 'package:flutter_example_test/lang/translation_service.dart';
 import 'package:flutter_example_test/listener/AppLifecycleObserver.dart';
-import 'package:flutter_example_test/network/ApiService.dart';
 import 'package:flutter_example_test/network/DioRequest.dart';
 import 'package:flutter_example_test/page/ListPage.dart';
 import 'package:flutter_example_test/page/NetworkPage.dart';
+import 'package:flutter_example_test/page/ScreenAdapterPage.dart';
 import 'package:flutter_example_test/page/ThirdPage.dart';
 import 'package:flutter_example_test/page/secondPage.dart';
 import 'package:flutter_example_test/utils/SharedPrefsUtils.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 
 void main(){
@@ -47,73 +48,115 @@ class MyApp extends StatefulWidget {
 
 class _MyAppState extends State<MyApp> {
 
-  static Map<String, FlutterBoostRouteFactory> routerMap = {
-    "/":(settings, uniqueId){
-      return CupertinoPageRoute(settings:settings,builder: (_){
-        return const MyHomePage(title: "Flutter Demo Home");
-      });
-    },
-    "homePage":(settings, uniqueId){
-      return CupertinoPageRoute(settings:settings,builder: (_){
-        return const MyHomePage(title: "Flutter Demo Home");
-      });
-    },
-    "secondPage": (settings,uniqueId){
-      return CupertinoPageRoute(settings:settings,builder: (_){
-        Map<String,dynamic> map =settings.arguments as Map<String,dynamic>;
-        var data = map["data"];
-        return SecondPage(data: data);
-      });
-    },
-    "thirdPage": (settings,uniqueId){
-      return CupertinoPageRoute(settings:settings,builder: (_){
-        Map<String,dynamic> map =settings.arguments as Map<String,dynamic>;
-        var data = map["data"];
-        return ThirdPage(data: data);
-      });
-    },
-    "listPage": (settings,uniqueId){
-      return CupertinoPageRoute(settings:settings,builder: (_){
-        return ListPage();
-      });
-    },
-    "networkPage": (settings,uniqueId){
-      return CupertinoPageRoute(settings:settings,builder: (_){
-        return NetworkPage();
-      });
-    },
+  late Map<String, FlutterBoostRouteFactory> _routerMap ;
 
-  };
+  Map<String, FlutterBoostRouteFactory> _initRoute(){
+    return {
+      "/":(settings, uniqueId){
+        return CupertinoPageRoute(settings:settings,builder: (_){
+          return const MainPage();
+        });
+      },
+      "homePage":(settings, uniqueId){
+        return CupertinoPageRoute(settings:settings,builder: (_){
+          return const MyHomePage(title: "Flutter Demo Home");
+        });
+      },
+      "secondPage": (settings,uniqueId){
+        return CupertinoPageRoute(settings:settings,builder: (_){
+          Map<String,dynamic> map =settings.arguments as Map<String,dynamic>;
+          var data = map["data"];
+          return SecondPage(data: data);
+        });
+      },
+      "thirdPage": (settings,uniqueId){
+        return CupertinoPageRoute(settings:settings,builder: (_){
+          Map<String,dynamic> map =settings.arguments as Map<String,dynamic>;
+          var data = map["data"];
+          return ThirdPage(data: data);
+        });
+      },
+      "listPage": (settings,uniqueId){
+        return CupertinoPageRoute(settings:settings,builder: (_){
+          return const ListPage();
+        });
+      },
+      "networkPage": (settings,uniqueId){
+        return CupertinoPageRoute(settings:settings,builder: (_){
+          return const NetworkPage();
+        });
+      },
+      "screenAdaptPage": (settings,uniqueId){
+        return CupertinoPageRoute(settings:settings,builder: (_){
+          return const ScreenAdapterPage();
+        });
+      },
+
+    };
+  }
+
+  @override
+  void initState(){
+    super.initState();
+    _routerMap = _initRoute();
+  }
 
   Route<dynamic>? routeFactory(RouteSettings settings, String? uniqueId) {
-    FlutterBoostRouteFactory? func = routerMap[settings.name!];
+    FlutterBoostRouteFactory? func = _routerMap[settings.name!];
     if (func == null) {
       return null;
     }
     return func(settings, uniqueId);
   }
 
-  // Widget appBuilder(Widget home) {
-  //   return MaterialApp(
-  //     home: home,
-  //     debugShowCheckedModeBanner: true,
-  //
-  //     ///必须加上builder参数，否则showDialog等会出问题
-  //     builder: (_, __) {
-  //       return home;
-  //     },
-  //   );
-  // }
+  Widget appBuilder(Widget home) {
+    return MaterialApp(
+      home: home,
+      debugShowCheckedModeBanner: true,
+      // translations: TranslationService(),
+      locale: const Locale('zh','CN'),
+      // fallbackLocale: const Locale('zh','CN'),
+      // routes: {
+      //   "homePage" : (context) => const MyHomePage(title: "routes home")
+      // },
+      // getPages: [
+      //   GetPage(name: "/", page: () => const MyHomePage(title: "GetPage home")),
+      //   GetPage(name: "/second", page: () => const SecondPage(data: "",)),
+      //   GetPage(name: "/third", page: () => const ThirdPage(data: "{data}")),
+      //   GetPage(name: "/network", page: () => const NetworkPage()),
+      //   GetPage(name: "/screen", page: () => const ScreenAdapterPage()),
+      // ],
+
+      ///必须加上builder参数，否则showDialog等会出问题
+      builder: (context, __) {
+        ScreenUtil.init(context);
+        return Theme(
+            data: ThemeData(
+              primarySwatch: Colors.blue,
+              textTheme: TextTheme(bodySmall: TextStyle(fontSize: 30.sp)),
+            ),
+            child: home);
+      },
+    );
+  }
   @override
   Widget build(BuildContext context) {
+    // return GetMaterialApp(
+    //     debugShowCheckedModeBanner: true,
+    //     translations: TranslationService(),
+    //     locale: const Locale('zh','CN'),
+    //     fallbackLocale: const Locale('zh','CN'),
+    //     getPages: [
+    //       GetPage(name: "/", page: () => const MyHomePage(title: "GetPage home")),
+    //       GetPage(name: "/second", page: () => const SecondPage(data: "",)),
+    //       GetPage(name: "/third", page: () => const ThirdPage(data: "{data}")),
+    //       GetPage(name: "/network", page: () => const NetworkPage()),
+    //       GetPage(name: "/screen", page: () => const ScreenAdapterPage()),
+    //     ],
+    // );
     return FlutterBoostApp(
       routeFactory,
-      appBuilder: (child) => GetMaterialApp(
-        translations: TranslationService(),
-        locale: const Locale('zh','CN'),
-        fallbackLocale: const Locale('zh','CN'),
-        home: child,
-      ),
+      appBuilder: appBuilder
     );
   }
 
@@ -150,37 +193,15 @@ class _MyHomePageState extends State<MyHomePage>{
 
   @override
   Widget build(BuildContext context) {
-    // This method is rerun every time setState is called, for instance as done
-    // by the _incrementCounter method above.
-    //
-    // The Flutter framework has been optimized to make rerunning build methods
-    // fast, so that you can just rebuild anything that needs updating rather
-    // than having to individually change instances of widgets.
     debugPrint("测试日志打印");
+    Get.put(HomeController());
+
     return Scaffold(
       appBar: AppBar(
-        // Here we take the value from the MyHomePage object that was created by
-        // the App.build method, and use it to set our appbar title.
         title: Text(widget.title),
       ),
       body: Center(
-        // Center is a layout widget. It takes a single child and positions it
-        // in the middle of the parent.
         child: Column(
-          // Column is also a layout widget. It takes a list of children and
-          // arranges them vertically. By default, it sizes itself to fit its
-          // children horizontally, and tries to be as tall as its parent.
-          //
-          // Invoke "debug painting" (press "p" in the console, choose the
-          // "Toggle Debug Paint" action from the Flutter Inspector in Android
-          // Studio, or the "Toggle Debug Paint" command in Visual Studio Code)
-          // to see the wireframe for each widget.
-          //
-          // Column has various properties to control how it sizes itself and
-          // how it positions its children. Here we use mainAxisAlignment to
-          // center the children vertically; the main axis here is the vertical
-          // axis because Columns are vertical (the cross axis would be
-          // horizontal).
           mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
             const Text(
@@ -237,9 +258,16 @@ class _MyHomePageState extends State<MyHomePage>{
               BoostNavigator.instance.push("listPage")
             }, child: const Text('打开列表页面')),
             ElevatedButton(onPressed: () => {
-            SharedPrefsUtils.setString('local', 'en'),
-              Get.updateLocale(const Locale('en'))
-            }, child: const Text('切换英文'))
+            // SharedPrefsUtils.setString('local', 'en'),
+            //   Get.updateLocale(const Locale('en','US'))
+            }, child: const Text('切换英文')),
+            ElevatedButton(onPressed: () => {
+            // SharedPrefsUtils.setString('local', 'zh'),
+            //   Get.updateLocale(const Locale('zh','CN'))
+            }, child: const Text('切换中文')),
+            ElevatedButton(onPressed: () => {
+              BoostNavigator.instance.push("screenAdaptPage")
+            }, child: const Text('打开屏幕适配页面'))
           ],
         ),
       ),
@@ -250,6 +278,40 @@ class _MyHomePageState extends State<MyHomePage>{
       ), // This trailing comma makes auto-formatting nicer for build methods.
     );
   }
+
+
+}
+
+class HomeController extends GetxController {
+  @override
+  void onClose() {
+    // TODO: implement onClose
+    super.onClose();
+    print("HomeController onClose");
+
+  }
 }
 
 
+class MainPage extends StatefulWidget {
+  const MainPage({super.key});
+
+  @override
+  State<MainPage> createState() => _MainPageState();
+}
+
+class _MainPageState extends State<MainPage> {
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text("Flutter主页面"),
+      ),
+      body: Center(
+        child:  ElevatedButton(onPressed: () => {
+          BoostNavigator.instance.push("homePage")
+        }, child: const Text('打开主页面')),
+      ),
+    );
+  }
+}

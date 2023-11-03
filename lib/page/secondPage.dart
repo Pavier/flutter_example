@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_boost/flutter_boost.dart';
+import 'package:get/get.dart';
 
 class SecondPage extends StatelessWidget {
   final String data;
@@ -7,6 +8,7 @@ class SecondPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    Get.put(SecondController());
     return Scaffold(
       appBar: AppBar(
         title: const Text("SecondPage"),
@@ -24,5 +26,14 @@ class SecondPage extends StatelessWidget {
             )
         ),
     );
+  }
+}
+
+class SecondController extends GetxController {
+  @override
+  void onClose() {
+    // TODO: implement onClose
+    super.onClose();
+    print("SecondController onClose");
   }
 }

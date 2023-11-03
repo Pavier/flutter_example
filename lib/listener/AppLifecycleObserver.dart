@@ -22,14 +22,16 @@ class AppLifecycleObserver with GlobalPageVisibilityObserver {
   void onPagePush(Route route) {
     super.onPagePush(route);
     RouterReportManager.reportCurrentRoute(route);
-    debugPrint("AppLifecycleObserver - onPagePush");
+    var name = route.settings.name;
+    debugPrint("AppLifecycleObserver - onPagePush  --- $name");
   }
 
   @override
   void onPagePop(Route route) {
     super.onPagePop(route);
     RouterReportManager.reportRouteDispose(route);
-    debugPrint("AppLifecycleObserver - onPagePop");
+    var name = route.settings.name;
+    debugPrint("AppLifecycleObserver - onPagePop  --- $name");
   }
 
   @override
@@ -42,22 +44,15 @@ class AppLifecycleObserver with GlobalPageVisibilityObserver {
   void onPageShow(Route route) {
     super.onPageShow(route);
     debugPrint("AppLifecycleObserver - onPageShow");
-    var arg = route.settings.arguments as Map<String,dynamic>;
-    debugPrint("$arg  更新语言---> zh");
-    var local = arg['local'] ?? 'zh';
+    if(route.settings.arguments is Map<String,dynamic>){
+      var arg = route.settings.arguments as Map<String,dynamic>;
+      debugPrint("$arg  更新语言---> zh");
+      var local = arg['local'];
 
-    // SharedPreferences.getInstance().then((prefs) {
-    //   var cacheLocal = prefs.getString("local");
-    //   debugPrint("$arg  更新语言---> cacheLocal: $cacheLocal   local $local");
-    //   if(local != cacheLocal){
-    //     debugPrint("-------开始更新-----");
-    //     prefs.setString('local', local);
-    //     Get.updateLocale(Locale(local));
-    //   }
-    // });
-    if(SharedPrefsUtils.getString("local") != local){
-      SharedPrefsUtils.setString('local', local);
-      Get.updateLocale(Locale(local));
+      // if(local != null && SharedPrefsUtils.getString("local") != local){
+      //   SharedPrefsUtils.setString('local', local);
+      //   Get.updateLocale(Locale(local));
+      // }
     }
 
   }
