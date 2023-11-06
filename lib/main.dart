@@ -49,6 +49,7 @@ class MyApp extends StatefulWidget {
 
 class _MyAppState extends State<MyApp> {
 
+  ///使用 BoostCacheWidget包裹你的页面时，可以解决push pageA->pageB->pageC 过程中，pageA，pageB 会多次 rebuild 的问题
   final Map<String, FlutterBoostRouteFactory> _routerMap = {
     "/":(settings, uniqueId){
       return CupertinoPageRoute(settings:settings,builder: (_) {
@@ -70,29 +71,45 @@ class _MyAppState extends State<MyApp> {
       return CupertinoPageRoute(settings:settings,builder: (_){
         Map<String,dynamic> map =settings.arguments as Map<String,dynamic>;
         var data = map["data"];
-        return SecondPage(data: data);
+        return BoostCacheWidget(
+            uniqueId: uniqueId!,
+            builder: (_) => SecondPage(data: data)
+        );
+
       });
     },
     "thirdPage": (settings,uniqueId){
       return CupertinoPageRoute(settings:settings,builder: (_){
         Map<String,dynamic> map =settings.arguments as Map<String,dynamic>;
         var data = map["data"];
-        return ThirdPage(data: data);
+        return BoostCacheWidget(
+            uniqueId: uniqueId!,
+            builder: (_) => ThirdPage(data: data)
+        );
       });
     },
     "listPage": (settings,uniqueId){
       return CupertinoPageRoute(settings:settings,builder: (_){
-        return const ListPage();
+        return BoostCacheWidget(
+            uniqueId: uniqueId!,
+            builder: (_) => const ListPage()
+        );
       });
     },
     "networkPage": (settings,uniqueId){
       return CupertinoPageRoute(settings:settings,builder: (_){
-        return const NetworkPage();
+        return BoostCacheWidget(
+            uniqueId: uniqueId!,
+            builder: (_) => const NetworkPage()
+        );
       });
     },
     "screenAdaptPage": (settings,uniqueId){
       return CupertinoPageRoute(settings:settings,builder: (_){
-        return const ScreenAdapterPage();
+        return BoostCacheWidget(
+            uniqueId: uniqueId!,
+            builder: (_) => const ScreenAdapterPage()
+        );
       });
     },
 
