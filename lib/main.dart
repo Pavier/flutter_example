@@ -2,7 +2,6 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_boost/flutter_boost.dart';
 import 'package:flutter_example_test/PlatFormMethod.dart';
-import 'package:flutter_example_test/lang/translation_service.dart';
 import 'package:flutter_example_test/listener/AppLifecycleObserver.dart';
 import 'package:flutter_example_test/network/DioRequest.dart';
 import 'package:flutter_example_test/page/ListPage.dart';
@@ -13,6 +12,8 @@ import 'package:flutter_example_test/page/secondPage.dart';
 import 'package:flutter_example_test/utils/SharedPrefsUtils.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:flutter_example_test/event/EventBus.dart';
 
 void main(){
   PageVisibilityBinding.instance.addGlobalObserver(AppLifecycleObserver());
@@ -48,58 +49,57 @@ class MyApp extends StatefulWidget {
 
 class _MyAppState extends State<MyApp> {
 
-  late Map<String, FlutterBoostRouteFactory> _routerMap ;
+  final Map<String, FlutterBoostRouteFactory> _routerMap = {
+    "/":(settings, uniqueId){
+      return CupertinoPageRoute(settings:settings,builder: (_) {
+        return BoostCacheWidget(
+            uniqueId: uniqueId!,
+            builder: (_) => const MainPage()
+        );
+      });
+    },
+    "homePage":(settings, uniqueId){
+      return CupertinoPageRoute(settings:settings,builder: (_) {
+        return BoostCacheWidget(
+            uniqueId: uniqueId!,
+            builder: (_) => const MyHomePage(title: "Flutter Demo Home")
+        );
+      });
+    },
+    "secondPage": (settings,uniqueId){
+      return CupertinoPageRoute(settings:settings,builder: (_){
+        Map<String,dynamic> map =settings.arguments as Map<String,dynamic>;
+        var data = map["data"];
+        return SecondPage(data: data);
+      });
+    },
+    "thirdPage": (settings,uniqueId){
+      return CupertinoPageRoute(settings:settings,builder: (_){
+        Map<String,dynamic> map =settings.arguments as Map<String,dynamic>;
+        var data = map["data"];
+        return ThirdPage(data: data);
+      });
+    },
+    "listPage": (settings,uniqueId){
+      return CupertinoPageRoute(settings:settings,builder: (_){
+        return const ListPage();
+      });
+    },
+    "networkPage": (settings,uniqueId){
+      return CupertinoPageRoute(settings:settings,builder: (_){
+        return const NetworkPage();
+      });
+    },
+    "screenAdaptPage": (settings,uniqueId){
+      return CupertinoPageRoute(settings:settings,builder: (_){
+        return const ScreenAdapterPage();
+      });
+    },
 
-  Map<String, FlutterBoostRouteFactory> _initRoute(){
-    return {
-      "/":(settings, uniqueId){
-        return CupertinoPageRoute(settings:settings,builder: (_){
-          return const MainPage();
-        });
-      },
-      "homePage":(settings, uniqueId){
-        return CupertinoPageRoute(settings:settings,builder: (_){
-          return const MyHomePage(title: "Flutter Demo Home");
-        });
-      },
-      "secondPage": (settings,uniqueId){
-        return CupertinoPageRoute(settings:settings,builder: (_){
-          Map<String,dynamic> map =settings.arguments as Map<String,dynamic>;
-          var data = map["data"];
-          return SecondPage(data: data);
-        });
-      },
-      "thirdPage": (settings,uniqueId){
-        return CupertinoPageRoute(settings:settings,builder: (_){
-          Map<String,dynamic> map =settings.arguments as Map<String,dynamic>;
-          var data = map["data"];
-          return ThirdPage(data: data);
-        });
-      },
-      "listPage": (settings,uniqueId){
-        return CupertinoPageRoute(settings:settings,builder: (_){
-          return const ListPage();
-        });
-      },
-      "networkPage": (settings,uniqueId){
-        return CupertinoPageRoute(settings:settings,builder: (_){
-          return const NetworkPage();
-        });
-      },
-      "screenAdaptPage": (settings,uniqueId){
-        return CupertinoPageRoute(settings:settings,builder: (_){
-          return const ScreenAdapterPage();
-        });
-      },
+  };
 
-    };
-  }
+  static _AppSetting setting = _AppSetting();
 
-  @override
-  void initState(){
-    super.initState();
-    _routerMap = _initRoute();
-  }
 
   Route<dynamic>? routeFactory(RouteSettings settings, String? uniqueId) {
     FlutterBoostRouteFactory? func = _routerMap[settings.name!];
@@ -109,23 +109,45 @@ class _MyAppState extends State<MyApp> {
     return func(settings, uniqueId);
   }
 
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    bus.on('local', (arg) {
+      setting.changeLocale!(Locale(arg));
+    });
+    setting.changeLocale = (Locale locale) {
+      setState(() {
+        setting._locale = locale;
+      });
+    };
+  }
+
+  @override
+  void dispose() {
+    // TODO: implement dispose
+    bus.off('local');
+    super.dispose();
+  }
+
   Widget appBuilder(Widget home) {
     return MaterialApp(
       home: home,
       debugShowCheckedModeBanner: true,
-      // translations: TranslationService(),
-      locale: const Locale('zh','CN'),
-      // fallbackLocale: const Locale('zh','CN'),
+      localeResolutionCallback: (Locale? locale, Iterable<Locale> supportedLocales) {
+        var result = supportedLocales.where((element) => element.languageCode == locale?.languageCode);
+        if (result.isNotEmpty) {
+          return locale;
+        }
+        return Locale('zh');
+      },
+      localizationsDelegates: AppLocalizations.localizationsDelegates,
+      supportedLocales: AppLocalizations.supportedLocales,
+      locale: setting._locale,
       // routes: {
-      //   "homePage" : (context) => const MyHomePage(title: "routes home")
+      //   "/" : (_) => const MainPage(),
+      //   "homePage" : (_) => const MyHomePage(title: "Flutter Demo Home")
       // },
-      // getPages: [
-      //   GetPage(name: "/", page: () => const MyHomePage(title: "GetPage home")),
-      //   GetPage(name: "/second", page: () => const SecondPage(data: "",)),
-      //   GetPage(name: "/third", page: () => const ThirdPage(data: "{data}")),
-      //   GetPage(name: "/network", page: () => const NetworkPage()),
-      //   GetPage(name: "/screen", page: () => const ScreenAdapterPage()),
-      // ],
 
       ///必须加上builder参数，否则showDialog等会出问题
       builder: (context, __) {
@@ -217,7 +239,7 @@ class _MyHomePageState extends State<MyHomePage>{
                 ),
             ),
             Text(
-              'test'.tr,
+              "${AppLocalizations.of(context)?.helloWorld}",
             ),
             InkWell(
               child: Obx(() =>
@@ -258,12 +280,12 @@ class _MyHomePageState extends State<MyHomePage>{
               BoostNavigator.instance.push("listPage")
             }, child: const Text('打开列表页面')),
             ElevatedButton(onPressed: () => {
-            // SharedPrefsUtils.setString('local', 'en'),
-            //   Get.updateLocale(const Locale('en','US'))
+            SharedPrefsUtils.setString('local', 'en'),
+              _MyAppState.setting.changeLocale!(Locale('en'))
             }, child: const Text('切换英文')),
             ElevatedButton(onPressed: () => {
-            // SharedPrefsUtils.setString('local', 'zh'),
-            //   Get.updateLocale(const Locale('zh','CN'))
+            SharedPrefsUtils.setString('local', 'zh'),
+              _MyAppState.setting.changeLocale!(Locale('zh'))
             }, child: const Text('切换中文')),
             ElevatedButton(onPressed: () => {
               BoostNavigator.instance.push("screenAdaptPage")
@@ -314,4 +336,13 @@ class _MainPageState extends State<MainPage> {
       ),
     );
   }
+}
+
+
+class _AppSetting {
+  _AppSetting(): _locale = Locale(SharedPrefsUtils.getString('local') ?? 'zh');
+
+  Function(Locale locale)? changeLocale;
+  Locale _locale;
+
 }

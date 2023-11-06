@@ -1,9 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_boost/flutter_boost.dart';
+import 'package:flutter_example_test/event/EventBus.dart';
 import 'package:flutter_example_test/utils/SharedPrefsUtils.dart';
-import 'package:get/get.dart';
 import 'package:get/get_navigation/src/router_report.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 
 class AppLifecycleObserver with GlobalPageVisibilityObserver {
   @override
@@ -24,6 +23,16 @@ class AppLifecycleObserver with GlobalPageVisibilityObserver {
     RouterReportManager.reportCurrentRoute(route);
     var name = route.settings.name;
     debugPrint("AppLifecycleObserver - onPagePush  --- $name");
+    if(route.settings.arguments is Map<String,dynamic>){
+      var arg = route.settings.arguments as Map<String,dynamic>;
+      debugPrint("$arg  更新语言---> zh");
+      var local = arg['local'];
+
+      if(local != null && SharedPrefsUtils.getString("local") != local){
+        SharedPrefsUtils.setString('local', local);
+        bus.emit('local',local);
+      }
+    }
   }
 
   @override
@@ -44,16 +53,5 @@ class AppLifecycleObserver with GlobalPageVisibilityObserver {
   void onPageShow(Route route) {
     super.onPageShow(route);
     debugPrint("AppLifecycleObserver - onPageShow");
-    if(route.settings.arguments is Map<String,dynamic>){
-      var arg = route.settings.arguments as Map<String,dynamic>;
-      debugPrint("$arg  更新语言---> zh");
-      var local = arg['local'];
-
-      // if(local != null && SharedPrefsUtils.getString("local") != local){
-      //   SharedPrefsUtils.setString('local', local);
-      //   Get.updateLocale(Locale(local));
-      // }
-    }
-
   }
 }
