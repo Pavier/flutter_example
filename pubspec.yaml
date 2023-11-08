@@ -41,6 +41,8 @@ dependencies:
   flutter_localizations:
     sdk: flutter
   intl: any
+  lottie: ^2.7.0
+  flutter_easyloading: ^3.0.5
 
 dev_dependencies:
   flutter_test:

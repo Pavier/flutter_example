@@ -221,14 +221,6 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage>{
-  final _sum = 0.obs;
-  final _sub = 0.obs;
-  final _result = "".obs;
-
-  void _incrementCounter() {
-    _sum.value++;
-    _sub.value--;
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -248,7 +240,7 @@ class _MyHomePageState extends State<MyHomePage>{
             ),
             Obx(() =>
                 Text(
-                  'result:$_result',
+                  'result:${HomeController.to.result}',
                   style: const TextStyle(
                     fontSize: 16.0,
                     color: Colors.red,
@@ -263,55 +255,29 @@ class _MyHomePageState extends State<MyHomePage>{
                   Column(
                     children: [
                       Text(
-                        '$_sum',
+                        '${HomeController.to.sum}',
                         style: Theme.of(context).textTheme.headlineMedium,
                       ),
                       Text(
-                        '$_sub',
+                        '${HomeController.to.sub}',
                         style: Theme.of(context).textTheme.headlineMedium,
                       ),
                     ],
                   )
               ),
-              onTap: () {
-                // BoostNavigator.instance.push("thirdPage",arguments: {"data":"flutter 内部跳转,等待参数回传"});
-                BoostNavigator.instance.push("thirdPage",arguments: {"data":"flutter 内部跳转,等待参数回传"},
-                    withContainer: true, opaque: false).then((value) {
-                      var map = value as Map;
-                      String data = map['pop'];
-                      debugPrint("result = pop = $data");
-                      _result.value = data;
-                });
-              }
+              onTap: () => HomeController.to.navigateToThirdPage()
             ),
-            ElevatedButton(onPressed: () => {
-              BoostNavigator.instance.push("secondPage",arguments: {"data":"flutter 内部跳转"})
-            }, child: const Text('第二个页面')),
-            ElevatedButton(onPressed: () => {
-              callNativeMethod("showLoading", {"msg" : "加载中"}),
-              Future.delayed(const Duration(seconds: 5)).then((v){
-                callNativeMethod("dismissLoading");
-            })
-            }, child: const Text('调用native中的方法')),
-            ElevatedButton(onPressed: () => {
-              BoostNavigator.instance.push("listPage")
-            }, child: const Text('打开列表页面')),
-            ElevatedButton(onPressed: () => {
-            SharedPrefsUtils.setString('local', 'en'),
-              _MyAppState.setting.changeLocale!(Locale('en'))
-            }, child: const Text('切换英文')),
-            ElevatedButton(onPressed: () => {
-            SharedPrefsUtils.setString('local', 'zh'),
-              _MyAppState.setting.changeLocale!(Locale('zh'))
-            }, child: const Text('切换中文')),
-            ElevatedButton(onPressed: () => {
-              BoostNavigator.instance.push("screenAdaptPage")
-            }, child: const Text('打开屏幕适配页面'))
+            ElevatedButton(onPressed: () => HomeController.to.navigateToSecondPage(), child: const Text('第二个页面')),
+            ElevatedButton(onPressed: () => HomeController.to.callMethod(), child: const Text('调用native中的方法')),
+            ElevatedButton(onPressed: () => HomeController.to.openListPage(), child: const Text('打开列表页面')),
+            ElevatedButton(onPressed: () => HomeController.to.changeLocal('en'), child: const Text('切换英文')),
+            ElevatedButton(onPressed: () => HomeController.to.changeLocal('zh'), child: const Text('切换中文')),
+            ElevatedButton(onPressed: () => HomeController.to.openScreenAdaptPage(), child: const Text('打开屏幕适配页面'))
           ],
         ),
       ),
       floatingActionButton: FloatingActionButton(
-        onPressed: _incrementCounter,
+        onPressed: () => HomeController.to.incrementCounter(),
         tooltip: 'Increment',
         child: const Icon(Icons.add),
       ), // This trailing comma makes auto-formatting nicer for build methods.
@@ -322,6 +288,51 @@ class _MyHomePageState extends State<MyHomePage>{
 }
 
 class HomeController extends GetxController {
+  static HomeController get to => Get.find();
+
+  final sum = 0.obs;
+  final sub = 0.obs;
+  final result = "".obs;
+
+  void incrementCounter() {
+    sum.value++;
+    sub.value--;
+  }
+
+  void navigateToSecondPage() {
+    BoostNavigator.instance.push("secondPage",arguments: {"data":"flutter 内部跳转"});
+  }
+
+  void navigateToThirdPage() {
+    BoostNavigator.instance.push("thirdPage", arguments: {"data": "flutter 内部跳转,等待参数回传"},
+        withContainer: true, opaque: false).then((value) {
+      var map = value as Map;
+      String data = map['pop'];
+      debugPrint("result = pop = $data");
+      result.value = data;
+    });
+  }
+
+  void callMethod() {
+    callNativeMethod("showLoading", {"msg" : "加载中"});
+    Future.delayed(const Duration(seconds: 5)).then((v){
+      callNativeMethod("dismissLoading");
+    });
+  }
+
+  void changeLocal(String localName){
+    SharedPrefsUtils.setString('local', localName);
+    _MyAppState.setting.changeLocale!(Locale(localName));
+  }
+
+  void openListPage() {
+    BoostNavigator.instance.push("listPage");
+  }
+
+  void openScreenAdaptPage() {
+    BoostNavigator.instance.push("screenAdaptPage");
+  }
+
   @override
   void onClose() {
     // TODO: implement onClose

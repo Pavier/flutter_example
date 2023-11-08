@@ -1,6 +1,8 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_example_test/PlatFormMethod.dart';
+import 'package:flutter_example_test/entity/brand.dart';
+import 'package:flutter_example_test/network/HttpUtils.dart';
 import 'package:get/get.dart';
 import '../network/ApiService.dart';
 
@@ -48,9 +50,17 @@ class _NetworkPageState extends State<NetworkPage> {
     // final response = await ApiService.dio.get(url);
     // _response.value = "$requestStr\n$response";
     // callNativeMethod("dismissLoading");
-    ApiService.getBrands().then((value){
-      _response.value = "$value";
-      callNativeMethod("dismissLoading");
+    // ApiService.getBrands().then((value){
+    //   _response.value = "$value";
+    //   callNativeMethod("dismissLoading");
+    // });
+    get(ApiService.brands_url,fromJsonFun: (dynamic data){
+      return Brand.fromJson(data);
+    },successCallBack: (Brand data) => {
+      debugPrint(data.toJson().toString()),
+    callNativeMethod("dismissLoading")
+    },errorCallBack: () => {
+      callNativeMethod("dismissLoading")
     });
   }
 }
