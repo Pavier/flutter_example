@@ -1,6 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_boost/flutter_boost.dart';
+import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:flutter_example_test/PlatFormMethod.dart';
 import 'package:flutter_example_test/listener/AppLifecycleObserver.dart';
 import 'package:flutter_example_test/network/DioRequest.dart';
@@ -10,6 +11,8 @@ import 'package:flutter_example_test/page/ScreenAdapterPage.dart';
 import 'package:flutter_example_test/page/ThirdPage.dart';
 import 'package:flutter_example_test/page/secondPage.dart';
 import 'package:flutter_example_test/utils/SharedPrefsUtils.dart';
+import 'package:flutter_example_test/view/easy_loading_config.dart';
+import 'package:flutter_example_test/view/loading_ext.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
@@ -22,6 +25,7 @@ void main(){
   // ApiService.configureDio();
   DioRequest.initLocalTimeZone();
   runApp(const MyApp());
+  configEasyLoading();
 }
 
 ///创建一个自定义的Binding，继承和with的关系如下，里面什么都不用写
@@ -167,15 +171,17 @@ class _MyAppState extends State<MyApp> {
       // },
 
       ///必须加上builder参数，否则showDialog等会出问题
-      builder: (context, __) {
-        ScreenUtil.init(context);
-        return Theme(
+      builder: EasyLoading.init(
+        builder: (context, child) {
+          ScreenUtil.init(context);
+          return Theme(
             data: ThemeData(
               primarySwatch: Colors.blue,
               textTheme: TextTheme(bodySmall: TextStyle(fontSize: 30.sp)),
             ),
-            child: home);
-      },
+            child: child!);
+        }
+      ),
     );
   }
   @override
@@ -272,7 +278,8 @@ class _MyHomePageState extends State<MyHomePage>{
             ElevatedButton(onPressed: () => HomeController.to.openListPage(), child: const Text('打开列表页面')),
             ElevatedButton(onPressed: () => HomeController.to.changeLocal('en'), child: const Text('切换英文')),
             ElevatedButton(onPressed: () => HomeController.to.changeLocal('zh'), child: const Text('切换中文')),
-            ElevatedButton(onPressed: () => HomeController.to.openScreenAdaptPage(), child: const Text('打开屏幕适配页面'))
+            ElevatedButton(onPressed: () => HomeController.to.openScreenAdaptPage(), child: const Text('打开屏幕适配页面')),
+            ElevatedButton(onPressed: () => HomeController.to.show(), child: const Text('测试Loading弹窗'))
           ],
         ),
       ),
@@ -331,6 +338,23 @@ class HomeController extends GetxController {
 
   void openScreenAdaptPage() {
     BoostNavigator.instance.push("screenAdaptPage");
+  }
+
+  bool dismissOnTap = false;
+  void show(){
+    showLoading(status: "加载中...",dismissOnTap: dismissOnTap);
+    Future.delayed(const Duration(seconds: 3)).then((value) => {
+      dismiss(),
+      dismissOnTap = !dismissOnTap
+    }
+    );
+    // addStatusCallback('main',(status) {
+    //   if(status == EasyLoadingStatus.dismiss){
+    //     showSuccess("success...");
+    //     removeStatusCallback(key: 'main');
+    //   }
+    // });
+    // showError("error...");
   }
 
   @override

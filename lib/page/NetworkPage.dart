@@ -54,10 +54,16 @@ class _NetworkPageState extends State<NetworkPage> {
     //   _response.value = "$value";
     //   callNativeMethod("dismissLoading");
     // });
-    get(ApiService.brands_url,fromJsonFun: (dynamic data){
-      return Brand.fromJson(data);
-    },successCallBack: (Brand data) => {
-      debugPrint(data.toJson().toString()),
+    // get(ApiService.brands_url,fromJsonFun: (dynamic data){
+    //   return Brand.fromJson(data);
+    // },successCallBack: (Brand data) => {
+    //   debugPrint(data.toJson().toString()),
+    // callNativeMethod("dismissLoading")
+    // },errorCallBack: () => {
+    //   callNativeMethod("dismissLoading")
+    // });
+    get(ApiService.brands_url,successCallBack: (data) => {
+      debugPrint(data),
     callNativeMethod("dismissLoading")
     },errorCallBack: () => {
       callNativeMethod("dismissLoading")

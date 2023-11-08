@@ -6,7 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_example_test/entity/base_response.dart';
 import 'package:flutter_example_test/network/DioRequest.dart';
 
-void get<T,K>(String url,
+void get<T>(String url,
     {Map<String, dynamic>? params,
     CancelToken? cancelToken,
     BuildContext? context,
@@ -25,7 +25,7 @@ void get<T,K>(String url,
   }
 }
 
-void post<T,K>(String url,
+void post<T>(String url,
     {Map<String, dynamic>? params,
       CancelToken? cancelToken,
       BuildContext? context,
@@ -44,7 +44,7 @@ void post<T,K>(String url,
   }
 }
 
-void put<T,K>(String url,
+void put<T>(String url,
     {Map<String, dynamic>? params,
       CancelToken? cancelToken,
       BuildContext? context,
@@ -63,7 +63,7 @@ void put<T,K>(String url,
   }
 }
 
-_parseResult<T,K>(Response response,T? Function(dynamic)? fromJsonFun,Function? successCallBack,
+_parseResult<T>(Response response,T? Function(dynamic)? fromJsonFun,Function? successCallBack,
     Function? errorCallBack){
   if(response.data != null){
     BaseResponse baseResponse = BaseResponse.fromJson(response.data);
@@ -73,7 +73,7 @@ _parseResult<T,K>(Response response,T? Function(dynamic)? fromJsonFun,Function? 
           var data = fromJsonFun(baseResponse.data) as T;
           successCallBack?.call(data);
         }else {
-          successCallBack?.call(baseResponse.data as K);
+          successCallBack?.call(baseResponse.data);
         }
       }
       default : {
