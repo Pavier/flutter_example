@@ -1,7 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_example_test/PlatFormMethod.dart';
-import 'package:flutter_example_test/entity/brand.dart';
 import 'package:flutter_example_test/network/HttpUtils.dart';
 import 'package:get/get.dart';
 import '../network/ApiService.dart';

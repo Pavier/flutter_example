@@ -1,4 +1,3 @@
-import 'package:flutter_example_test/entity/brand.dart';
 import 'package:json_annotation/json_annotation.dart';
 
 part 'base_response.g.dart';

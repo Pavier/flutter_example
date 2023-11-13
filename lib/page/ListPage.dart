@@ -2,9 +2,11 @@ import 'package:easy_refresh/easy_refresh.dart';
 import 'package:english_words/english_words.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_example_test/PlatFormMethod.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 
 import '../entity/item.dart';
+import '../view/custom_header.dart';
 
 class ListPage extends StatefulWidget {
   const ListPage({super.key});
@@ -45,8 +47,8 @@ class _ListPageState extends State<ListPage> {
         ),
         body: EasyRefresh.builder(
             controller: _controller,
-            header: const ClassicHeader(),
-            footer: const ClassicFooter(),
+            header: CustomHeader(textStyle: TextStyle(fontSize: 13.sp)),
+            footer: const BezierFooter(),
             onRefresh: () async{
               _refreshData();
             },
